@@ -1,7 +1,8 @@
-# Uncomment the imports below before you add the function code
 import requests
 import os
 from dotenv import load_dotenv
+# 1. Add this import to handle spaces in URLs safely
+from urllib.parse import quote
 
 load_dotenv()
 
@@ -13,28 +14,34 @@ sentiment_analyzer_url = os.getenv(
 
 def get_request(endpoint, **kwargs):
     params = ""
-    if(kwargs):
-        for key,value in kwargs.items():
-            params=params+key+"="+value+"&"
+    if (kwargs):
+        for key, value in kwargs.items():
+            params = params+key+"="+value+"&"
 
     request_url = backend_url+endpoint+"?"+params
 
     print("GET from {} ".format(request_url))
     try:
-        # Call get method of requests library with URL and parameters
         response = requests.get(request_url)
         return response.json()
-    except:
-        # If any error occurs
+    except Exception:
         print("Network exception occurred")
+        # It's good practice to return an empty list or dict on failure here too, 
+        # but your current view handles None for get_request differently.
+        return None
 
-# def analyze_review_sentiments(text):
-# request_url = sentiment_analyzer_url+"analyze/"+text
-# Add code for retrieving sentiments
-
-# def post_review(data_dict):
-# Add code for posting review
-
+def analyze_review_sentiments(text):
+    encoded_text = quote(text)
+    request_url = sentiment_analyzer_url+"/analyze/"+encoded_text
+    
+    try:
+        response = requests.get(request_url)
+        return response.json()
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+        print("Network exception occurred")
+        # 3. Return a default values so views.py doesn't crash
+        return {"sentiment": "neutral"}
 def post_review(data_dict):
     request_url = backend_url+"/insert_review"
     try:
