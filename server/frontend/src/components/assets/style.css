@@ -123,3 +123,8 @@ img{
     text-align:center;
     box-shadow: 2px 2px 3px #999;  
 }
+
+body {
+  background-color: #f8f9fa; /* Bootstrap 'light' gray */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
